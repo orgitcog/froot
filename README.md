@@ -2,6 +2,62 @@
 
 **pₙ = prime shell around the ensemble structure of n**
 
+## Overview
+
+This repository integrates several complementary mathematical frameworks:
+
+1. **e9 Prime Eigenvalue Function**: Primes as eigenvalues of partition functions with Matula tree structures
+2. **Structural Dimension Theory (SDT)**: Three-axis classification for mathematical systems
+3. **Tensor Logic Framework** ⭐ NEW: Unified language for AI bridging symbolic logic and neural networks
+
+## Tensor Logic Framework
+
+**Tensor Logic** (based on [Pedro Domingos' work](https://arxiv.org/abs/2510.12269)) is a unified mathematical language for AI that bridges symbolic and neural paradigms through tensor operations.
+
+### Key Concepts
+
+- **Logical rules = Tensor equations**: Relations encoded as tensors (Boolean or real-valued)
+- **Inference = Tensor operations**: Join (multiplication) + Projection (summation)
+- **Temperature control**: T=0 for pure deductive reasoning, T>0 for analogical/neural inference
+- **Compilation strategies**: Different semantic interpretations (Boolean, Gödel, Product, Łukasiewicz, Soft Differentiable)
+
+### Quick Example
+
+```python
+from tensor_logic import create_backend, logical_and, reason
+import numpy as np
+
+# Basic logical operations
+backend = create_backend()
+a = np.array([1.0, 1.0, 0.0, 0.0])
+b = np.array([1.0, 0.0, 1.0, 0.0])
+result = logical_and(a, b, backend=backend)  # [1. 0. 0. 0.]
+
+# Knowledge graph reasoning
+parent = np.array([[0., 1., 0.], [0., 0., 1.], [0., 0., 0.]])
+# Infer grandparent: Alice -> Bob -> Carol
+grandparent = reason('Grandparent(x,z)', 
+                     predicates={'Parent': parent},
+                     temperature=0.0)  # Deductive reasoning
+```
+
+### Temperature-Controlled Reasoning
+
+The temperature parameter controls the inference mode:
+
+```
+T=0.0: Pure deductive (strict logic, zero hallucinations)
+T>0.0: Analogical reasoning (generalizes from patterns)
+
+  STRICT                          CREATIVE
+  T=0.0 ───────────────────────── T=2.0
+    │                               │
+    ▼                               ▼
+  Provably correct           Pattern-based inference
+```
+
+See [`examples_tensor_logic.py`](examples_tensor_logic.py) for comprehensive demonstrations.
+
 ## Concept
 
 The e9 library implements a profound mathematical concept: the nth prime doesn't just "happen" to be prime—it **crystallizes** the composite structure of n into a pure state. The prime is the **eigenvalue** of its index's partition function.
@@ -58,9 +114,99 @@ git clone https://github.com/o9nn/e9.git
 cd e9
 ```
 
-No external dependencies required - uses only Python standard library.
+## Installation
+
+Clone this repository:
+
+```bash
+git clone https://github.com/orgitcog/froot.git
+cd froot
+```
+
+For tensor logic functionality, install numpy:
+
+```bash
+pip install -r requirements.txt
+```
+
+The e9 and SDT frameworks use only Python standard library. Tensor Logic requires numpy for tensor operations.
 
 ## Usage
+
+### Tensor Logic Framework (NEW)
+
+#### Basic Operations
+
+```python
+from tensor_logic import create_backend, logical_and, logical_or
+import numpy as np
+
+backend = create_backend()
+a = np.array([1.0, 1.0, 0.0, 0.0])
+b = np.array([1.0, 0.0, 1.0, 0.0])
+
+result_and = logical_and(a, b, backend=backend)  # [1. 0. 0. 0.]
+result_or = logical_or(a, b, backend=backend)    # [1. 1. 1. 0.]
+```
+
+#### Knowledge Graph Reasoning
+
+```python
+from tensor_logic import reason, quantify
+import numpy as np
+
+# Define parent relation: Alice->Bob, Bob->Carol
+parent = np.array([
+    [0., 1., 0.],  # Alice is parent of Bob
+    [0., 0., 1.],  # Bob is parent of Carol
+    [0., 0., 0.],  # Carol has no children
+])
+
+# Infer grandparent relation (multi-hop reasoning)
+grandparent = reason('Grandparent(x,z)', 
+                     predicates={'Parent': parent},
+                     temperature=0.0)  # T=0: Deductive
+# Result: Alice is grandparent of Carol
+
+# Query: Who has children?
+has_children = quantify('exists y: Parent(x, y)',
+                        predicates={'Parent': parent})
+# Result: [1. 1. 0.] - Alice and Bob have children
+```
+
+#### Compilation Strategies
+
+```python
+from tensor_logic import create_strategy, CompilationStrategy
+
+backend = create_backend()
+
+# Hard Boolean: Exact verification (provably correct)
+strategy_bool = create_strategy(CompilationStrategy.HARD_BOOLEAN, backend)
+
+# Gödel: Continuous scoring (min/max for fuzzy logic)
+strategy_godel = create_strategy(CompilationStrategy.GODEL, backend)
+
+# Product: Probabilistic inference (independent events)
+strategy_prob = create_strategy(CompilationStrategy.PRODUCT, backend)
+
+# Soft Differentiable: Neural network training (backprop-ready)
+strategy_neural = create_strategy(CompilationStrategy.SOFT_DIFFERENTIABLE, backend)
+
+# Each strategy interprets the same tensor operations differently
+a, b = np.array([0.8, 0.6]), np.array([0.9, 0.5])
+result = strategy_godel.logical_and(a, b)  # [0.8, 0.5] (minimum)
+```
+
+#### Temperature-Controlled Inference
+
+```python
+# T=0: Pure deductive (strict logic, zero hallucinations)
+deductive = reason('Grandparent(x,z)', {'Parent': parent}, temperature=0.0)
+
+# T>0: Analogical (soft inference, generalizes patterns)
+analogical = reason('Grandparent(x,z)', {'Parent': parent}, temperature=1.0)
+```
 
 ### Basic Usage
 
@@ -180,20 +326,37 @@ print(nn.sdt_type)  # (N-ary, Real, Polynonion)
 
 ## Examples
 
-Run the examples to see the concept in action:
+Run the examples to see the concepts in action:
 
 ```bash
-# Original examples
+# Tensor Logic examples (NEW)
+python examples_tensor_logic.py
+
+# Original e9 examples
 python examples.py
 
 # Index injection examples
 python examples_index_injection.py
 
-# Structural Dimension Theory examples (NEW)
+# Structural Dimension Theory examples
 python examples_sdt.py
+
+# Hopf algebra examples
+python examples_hopf_algebra.py
+
+# Cognitive renormalization examples
+python examples_cognitive_renormalization.py
 ```
 
 These demonstrate:
+
+**Tensor Logic examples (NEW):**
+- Basic logical operations (AND, OR, NOT, IMPLIES)
+- Knowledge graph reasoning (family trees, multi-hop inference)
+- Temperature-controlled reasoning (deductive vs analogical)
+- Compilation strategies (5 different semantic interpretations)
+- Quantifiers (EXISTS, FORALL)
+- Neural-symbolic bridge (unified tensor operations)
 
 **Original examples (examples.py):**
 - Basic usage
@@ -223,18 +386,32 @@ These demonstrate:
 Run the test suite:
 
 ```bash
+# Test tensor logic framework (NEW)
+python test_tensor_logic.py
+
 # Test e9 framework
 python test_e9.py
 
-# Test SDT framework (NEW)
+# Test SDT framework
 python test_sdt.py
 
 # Or run all tests with verbose output
-python -m unittest test_e9 test_sdt -v
+python -m unittest test_tensor_logic test_e9 test_sdt -v
 ```
 
-All 115 tests should pass (75 for e9, 40 for SDT), including tests for:
-- Original prime eigenvalue functions (18 tests)
+All 158 tests should pass (43 for tensor logic, 75 for e9, 40 for SDT), including tests for:
+
+**Tensor Logic tests (43 tests - NEW):**
+- Backend operations (tensor creation, einsum, sigmoid, step function)
+- Compilation strategies (5 strategies × multiple operations)
+- Core logical operations (AND, OR, NOT, IMPLIES)
+- Quantifiers (EXISTS, FORALL)
+- Temperature-controlled reasoning
+- Knowledge graph reasoning scenarios
+- Multi-hop inference
+- Strategy comparison
+
+**Original prime eigenvalue functions (18 tests):**
 - Matula encoding/decoding (4 tests)
 - Index persona classification (5 tests)
 - Cognitive grammar analysis (3 tests)
@@ -300,6 +477,34 @@ The extended framework shows:
 
 ## API Reference
 
+### Tensor Logic Functions (NEW)
+
+**Core Operations:**
+- `logical_and(a, b, backend, strategy)`: Logical AND operation
+- `logical_or(a, b, backend, strategy)`: Logical OR operation
+- `logical_not(a, backend, strategy)`: Logical NOT operation
+- `logical_implies(a, b, backend, strategy)`: Logical implication (a → b)
+
+**Quantifiers:**
+- `exists(predicate, axis, backend)`: Existential quantification (∃x: P(x))
+- `forall(predicate, axis, backend)`: Universal quantification (∀x: P(x))
+
+**High-Level API:**
+- `reason(pattern, predicates, bindings, temperature, backend, strategy)`: Temperature-controlled reasoning
+- `quantify(pattern, predicates, backend, strategy)`: Pattern-based quantified queries
+- `apply_temperature(logits, temperature, backend)`: Apply temperature scaling for inference control
+
+**Backend & Strategy:**
+- `create_backend(name="numpy")`: Create tensor computation backend
+- `create_strategy(strategy_type, backend)`: Create compilation strategy
+
+**Compilation Strategies:**
+- `CompilationStrategy.HARD_BOOLEAN`: Exact verification (provably correct)
+- `CompilationStrategy.GODEL`: Continuous scoring (min/max semantics)
+- `CompilationStrategy.PRODUCT`: Probabilistic inference (independent events)
+- `CompilationStrategy.LUKASIEWICZ`: Bounded arithmetic (saturating)
+- `CompilationStrategy.SOFT_DIFFERENTIABLE`: Neural training (backprop-ready)
+
 ### Core Functions
 
 **Original:**
@@ -355,7 +560,12 @@ The extended framework shows:
 
 ## CLI Commands
 
-The CLI now supports 23 commands:
+The CLI now supports 26 commands:
+
+**Tensor Logic (NEW):**
+- `tensor-logic`: Demonstration of tensor logic framework
+- `tensor-strategies`: Show all compilation strategies
+- `tensor-reason <relation> [-t TEMP]`: Perform tensor logic reasoning with temperature control
 
 **Original:**
 - `eigenvalue <index>`: Get prime eigenvalue
@@ -392,6 +602,12 @@ The CLI now supports 23 commands:
 
 Example:
 ```bash
+# Tensor Logic (NEW)
+python cli.py tensor-logic                  # Show framework demo
+python cli.py tensor-strategies             # Compare compilation strategies
+python cli.py tensor-reason family -t 0.0   # Deductive reasoning (T=0)
+python cli.py tensor-reason family -t 1.0   # Analogical reasoning (T>0)
+
 # Index injection
 python cli.py persona 6 -p
 python cli.py persona-table 10
@@ -418,7 +634,48 @@ python cli.py sdt-learning neural    # Neural networks as transport
 
 ## Mathematical Framework (Extended)
 
-### Cognitive Renormalization Theorem (NEW)
+### Tensor Logic Framework (NEW)
+
+**Core Principle:** Logical rules and tensor equations are fundamentally the same operation.
+
+**Key Concepts:**
+
+1. **Relations as Tensors:**
+   - A relation like `Parent(Alice, Bob)` is encoded as a sparse tensor
+   - Value 1 at index `(Alice, Bob)`, 0 elsewhere
+   - Multi-dimensional tensors encode complex knowledge graphs
+
+2. **Inference as Tensor Operations:**
+   - Logical rules map to tensor operations
+   - Join = elementwise multiplication over shared indices
+   - Projection = summation over unmentioned indices
+   ```
+   Grandparent(x,z) = Σ_y Parent(x,y) ∧ Parent(y,z)
+   → Matrix multiplication: grandparent = parent @ parent
+   ```
+
+3. **Temperature Control:**
+   - T=0: Pure deductive (Heaviside step function)
+   - T>0: Analogical (temperature-scaled sigmoid)
+   - Bridges symbolic AI (provable) and neural AI (generalizable)
+
+4. **Compilation Strategies:**
+   - Different semantic interpretations of the same operations
+   - Hard Boolean: exact verification (step functions)
+   - Gödel: fuzzy logic (min/max operations)
+   - Product: probabilistic (multiplication for independence)
+   - Łukasiewicz: bounded arithmetic (saturating operations)
+   - Soft Differentiable: neural networks (sigmoid, backprop-ready)
+
+**The Unification:**
+```
+Symbolic AI ←─────── Tensor Logic ──────→ Neural AI
+  (T=0)          (unified framework)        (T>0)
+Provable            Both are just          Generalizes
+Zero errors      tensor operations!        Learns patterns
+```
+
+### Cognitive Renormalization Theorem
 
 The implementation now includes the **Connes-Kreimer Hopf algebra** structures for cognitive renormalization:
 

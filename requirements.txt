@@ -1,0 +1,3 @@
+# Tensor Logic dependencies
+# NumPy is required for tensor operations in the tensor logic framework
+numpy>=1.20.0
