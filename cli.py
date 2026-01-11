@@ -40,6 +40,14 @@ from sdt import (
     create_matula_recursonion,
 )
 
+# Import tensor logic functions
+import numpy as np
+from tensor_logic import (
+    create_backend, create_strategy, CompilationStrategy,
+    logical_and, logical_or, logical_not,
+    reason, quantify
+)
+
 
 def cmd_eigenvalue(args):
     """Get the prime eigenvalue for a given index."""
@@ -473,6 +481,95 @@ def cmd_sdt_recursonion(args):
     print()
 
 
+def cmd_tensor_logic_demo(args):
+    """Run tensor logic demonstration."""
+    print("=" * 60)
+    print("TENSOR LOGIC FRAMEWORK")
+    print("Unifying Neural and Symbolic AI via Tensors")
+    print("=" * 60)
+    print()
+    
+    backend = create_backend()
+    
+    # Basic example
+    print("1. Basic Logical Operations:")
+    a = np.array([1.0, 1.0, 0.0, 0.0])
+    b = np.array([1.0, 0.0, 1.0, 0.0])
+    print(f"   A = {a}")
+    print(f"   B = {b}")
+    result_and = logical_and(a, b, backend=backend)
+    result_or = logical_or(a, b, backend=backend)
+    print(f"   A AND B = {result_and}")
+    print(f"   A OR B  = {result_or}")
+    print()
+    
+    # Family tree reasoning
+    print("2. Knowledge Graph Reasoning:")
+    parent = np.array([[0., 1., 0.], [0., 0., 1.], [0., 0., 0.]])
+    print("   Parent: Alice->Bob, Bob->Carol")
+    grandparent = backend.matmul(parent, parent)
+    print(f"   Grandparent inferred: {grandparent[0]}")
+    print("   (Alice is grandparent of Carol!)")
+    print()
+    
+    # Temperature control
+    print("3. Temperature Control:")
+    print("   T=0 (deductive):", reason('Grandparent(x,z)', {'Parent': parent}, temperature=0.0)[0, 2])
+    print("   T=1 (analogical):", f"{reason('Grandparent(x,z)', {'Parent': parent}, temperature=1.0)[0, 2]:.4f}")
+    print()
+    
+    print("Run 'python examples_tensor_logic.py' for more examples!")
+    print()
+
+
+def cmd_tensor_logic_strategies(args):
+    """Show compilation strategies."""
+    print("=" * 60)
+    print("COMPILATION STRATEGIES")
+    print("=" * 60)
+    print()
+    
+    backend = create_backend()
+    a = np.array([0.8, 0.6])
+    b = np.array([0.9, 0.5])
+    
+    print(f"Input A: {a}")
+    print(f"Input B: {b}")
+    print()
+    
+    strategies = [
+        ("Hard Boolean", CompilationStrategy.HARD_BOOLEAN, "Exact verification"),
+        ("Gödel", CompilationStrategy.GODEL, "Continuous scoring (min/max)"),
+        ("Product", CompilationStrategy.PRODUCT, "Probabilistic inference"),
+        ("Łukasiewicz", CompilationStrategy.LUKASIEWICZ, "Bounded reasoning"),
+        ("Soft Differentiable", CompilationStrategy.SOFT_DIFFERENTIABLE, "Neural training"),
+    ]
+    
+    for name, strategy_type, desc in strategies:
+        strategy = create_strategy(strategy_type, backend)
+        result_and = strategy.logical_and(a, b)
+        print(f"{name:20} AND: {result_and}  ({desc})")
+    print()
+
+
+def cmd_tensor_logic_reason(args):
+    """Perform tensor logic reasoning."""
+    backend = create_backend()
+    
+    # Parse relation from args
+    if args.relation == 'family':
+        # Example family tree
+        parent = np.array([[0., 1., 0.], [0., 0., 1.], [0., 0., 0.]])
+        print("Family tree: Alice->Bob, Bob->Carol")
+        result = reason('Grandparent(x,z)', {'Parent': parent}, 
+                       temperature=args.temperature, backend=backend)
+        print(f"\nGrandparent relation (T={args.temperature}):")
+        print(result)
+    else:
+        print(f"Unknown relation: {args.relation}")
+    print()
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -585,6 +682,17 @@ def main():
     
     p_sdt_recursonion = subparsers.add_parser('sdt-recursonion', help='Show recursonion examples')
     
+    # Tensor Logic commands
+    p_tensor_demo = subparsers.add_parser('tensor-logic', help='Tensor logic framework demo')
+    
+    p_tensor_strategies = subparsers.add_parser('tensor-strategies', help='Show compilation strategies')
+    
+    p_tensor_reason = subparsers.add_parser('tensor-reason', help='Perform tensor logic reasoning')
+    p_tensor_reason.add_argument('relation', type=str, default='family',
+                                help='Relation to reason about (default: family)')
+    p_tensor_reason.add_argument('-t', '--temperature', type=float, default=0.0,
+                                help='Temperature for reasoning (default: 0.0)')
+    
     args = parser.parse_args()
     
     if not args.command:
@@ -636,6 +744,12 @@ def main():
             cmd_sdt_learning(args)
         elif args.command == 'sdt-recursonion':
             cmd_sdt_recursonion(args)
+        elif args.command == 'tensor-logic':
+            cmd_tensor_logic_demo(args)
+        elif args.command == 'tensor-strategies':
+            cmd_tensor_logic_strategies(args)
+        elif args.command == 'tensor-reason':
+            cmd_tensor_logic_reason(args)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
