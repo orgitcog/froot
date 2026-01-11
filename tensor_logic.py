@@ -91,7 +91,12 @@ def create_backend(name: str = "numpy") -> Backend:
     
     Returns:
         Backend instance
+    
+    Raises:
+        ValueError: If backend name is not supported
     """
+    if name != "numpy":
+        raise ValueError(f"Backend '{name}' not supported. Currently only 'numpy' is available.")
     return Backend(name)
 
 
@@ -377,7 +382,10 @@ def apply_temperature(logits: Any, temperature: float, backend: Optional[Backend
     if backend is None:
         backend = create_backend()
     
-    if temperature == 0:
+    # Use small epsilon for numerical stability
+    EPSILON = 1e-10
+    
+    if temperature < EPSILON:
         # Pure deductive: hard threshold
         return backend.step(logits, threshold=0.5)
     else:

@@ -89,7 +89,13 @@ class TestHardBooleanStrategy(unittest.TestCase):
         np.testing.assert_array_equal(result, expected)
     
     def test_logical_not(self):
-        """Test hard Boolean NOT."""
+        """Test hard Boolean NOT.
+        
+        NOT uses step(1 - a) with threshold 0.5:
+        - NOT 1.0 = step(0.0) = 0 (below threshold)
+        - NOT 0.0 = step(1.0) = 1 (above threshold)  
+        - NOT 0.5 = step(0.5) = 1 (at threshold, step is inclusive: x >= 0.5)
+        """
         a = np.array([1.0, 0.0, 0.5])
         result = self.strategy.logical_not(a)
         expected = np.array([0., 1., 1.])  # step(1 - a) with threshold 0.5
@@ -187,27 +193,42 @@ class TestLukasiewiczStrategy(unittest.TestCase):
 class TestSoftDifferentiableStrategy(unittest.TestCase):
     """Test soft differentiable compilation strategy."""
     
+    # Constants for expected sigmoid values
+    SIGMOID_0 = 0.5  # sigmoid(0) = 0.5
+    SIGMOID_1 = 0.7310585786300049  # sigmoid(1) ≈ 0.731
+    SIGMOID_THRESHOLD = 0.7  # Threshold for approximate comparison
+    
     def setUp(self):
         self.backend = create_backend()
         self.strategy = create_strategy(CompilationStrategy.SOFT_DIFFERENTIABLE, self.backend)
     
     def test_logical_and(self):
-        """Test soft AND (sigmoid(a+b-1))."""
+        """Test soft AND (sigmoid(a+b-1)).
+        
+        Expected values:
+        - sigmoid(1+1-1) = sigmoid(1) ≈ 0.731
+        - sigmoid(0+1-1) = sigmoid(0) = 0.5
+        """
         a = np.array([1.0, 0.0])
         b = np.array([1.0, 1.0])
         result = self.strategy.logical_and(a, b)
         # sigmoid(1+1-1)=sigmoid(1)≈0.73, sigmoid(0+1-1)=sigmoid(0)=0.5
-        self.assertGreater(result[0], 0.7)
-        self.assertAlmostEqual(result[1], 0.5, places=5)
+        self.assertGreater(result[0], self.SIGMOID_THRESHOLD)
+        self.assertAlmostEqual(result[1], self.SIGMOID_0, places=5)
     
     def test_logical_or(self):
-        """Test soft OR (sigmoid(a+b))."""
+        """Test soft OR (sigmoid(a+b)).
+        
+        Expected values:
+        - sigmoid(0+0) = sigmoid(0) = 0.5
+        - sigmoid(0+1) = sigmoid(1) ≈ 0.731
+        """
         a = np.array([0.0, 0.0])
         b = np.array([0.0, 1.0])
         result = self.strategy.logical_or(a, b)
         # sigmoid(0+0)=0.5, sigmoid(0+1)≈0.73
-        self.assertAlmostEqual(result[0], 0.5, places=5)
-        self.assertGreater(result[1], 0.7)
+        self.assertAlmostEqual(result[0], self.SIGMOID_0, places=5)
+        self.assertGreater(result[1], self.SIGMOID_THRESHOLD)
     
     def test_logical_not(self):
         """Test soft NOT (1 - a)."""
